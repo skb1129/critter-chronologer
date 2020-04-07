@@ -1,5 +1,7 @@
 package com.udacity.critter.user;
 
+import lombok.NoArgsConstructor;
+
 import java.time.DayOfWeek;
 import java.util.Set;
 
@@ -7,6 +9,7 @@ import java.util.Set;
  * Represents the form that employee request and response data takes. Does not map
  * to the database directly.
  */
+@NoArgsConstructor
 public class EmployeeDTO {
     private long id;
     private String name;

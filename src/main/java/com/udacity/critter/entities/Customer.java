@@ -1,11 +1,16 @@
 package com.udacity.critter.entities;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @Table
+@Data
+@NoArgsConstructor
 public class Customer implements Serializable {
     @Id
     @GeneratedValue
