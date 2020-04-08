@@ -15,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class Employee implements Serializable {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private String name;
