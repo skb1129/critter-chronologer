@@ -1,5 +1,6 @@
 package com.udacity.critter.services;
 
+import com.udacity.critter.entities.Customer;
 import com.udacity.critter.entities.Pet;
 import com.udacity.critter.pet.PetDTO;
 import com.udacity.critter.repositories.CustomersRepository;
@@ -36,12 +37,15 @@ public class PetsService {
 
     public PetDTO savePet(PetDTO petDTO) {
         Pet pet = new Pet();
+        Customer customer = customersRepository.getOne(petDTO.getOwnerId());
         pet.setType(petDTO.getType());
         pet.setName(petDTO.getName());
-        pet.setCustomer(customersRepository.getOne(petDTO.getOwnerId()));
+        pet.setCustomer(customer);
         pet.setBirthDate(petDTO.getBirthDate());
         pet.setNotes(petDTO.getNotes());
         pet = petsRepository.save(pet);
+        customer.insertPet(pet);
+        customersRepository.save(customer);
         return getDTOModel(pet);
     }
 

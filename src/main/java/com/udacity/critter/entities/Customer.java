@@ -24,4 +24,8 @@ public class Customer implements Serializable {
 
     @OneToMany(targetEntity = Pet.class)
     private List<Pet> pets;
+
+    public void insertPet(Pet pet) {
+        pets.add(pet);
+    }
 }

@@ -24,9 +24,11 @@ public class EmployeesService {
     }
 
     public List<EmployeeDTO> getEmployeesForService(EmployeeRequestDTO requestDTO) {
-        List<Employee> employees = employeesRepository.getAllBySkillsInAndDaysAvailableContains(
-                requestDTO.getSkills(), requestDTO.getDate().getDayOfWeek());
-        return employees.stream().map(this::getDTOModel).collect(Collectors.toList());
+        List<Employee> results = employeesRepository
+                .getAllByDaysAvailableContains(requestDTO.getDate().getDayOfWeek()).stream()
+                .filter(employee -> employee.getSkills().containsAll(requestDTO.getSkills()))
+                .collect(Collectors.toList());
+        return results.stream().map(this::getDTOModel).collect(Collectors.toList());
     }
 
     public EmployeeDTO saveEmployee(EmployeeDTO employeeDTO) {
