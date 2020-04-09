@@ -8,12 +8,10 @@ import com.udacity.critter.repositories.CustomersRepository;
 import com.udacity.critter.repositories.EmployeesRepository;
 import com.udacity.critter.repositories.PetsRepository;
 import com.udacity.critter.repositories.SchedulesRepository;
-import com.udacity.critter.schedule.ScheduleDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class SchedulesService {
@@ -30,48 +28,30 @@ public class SchedulesService {
     @Autowired
     private CustomersRepository customersRepository;
 
-    public List<ScheduleDTO> getAllSchedules() {
-        List<Schedule> schedules = schedulesRepository.findAll();
-        return schedules.stream().map(this::getDTOModel).collect(Collectors.toList());
+    public List<Schedule> getAllSchedules() {
+        return schedulesRepository.findAll();
     }
 
-    public List<ScheduleDTO> getAllSchedulesForPet(long petId) {
+    public List<Schedule> getAllSchedulesForPet(long petId) {
         Pet pet = petsRepository.getOne(petId);
-        List<Schedule> schedules = schedulesRepository.getAllByPetsContains(pet);
-        return schedules.stream().map(this::getDTOModel).collect(Collectors.toList());
+        return schedulesRepository.getAllByPetsContains(pet);
     }
 
-    public List<ScheduleDTO> getAllSchedulesForEmployee(long employeeId) {
+    public List<Schedule> getAllSchedulesForEmployee(long employeeId) {
         Employee employee = employeesRepository.getOne(employeeId);
-        List<Schedule> schedules = schedulesRepository.getAllByEmployeesContains(employee);
-        return schedules.stream().map(this::getDTOModel).collect(Collectors.toList());
+        return schedulesRepository.getAllByEmployeesContains(employee);
     }
 
-    public List<ScheduleDTO> getAllSchedulesForCustomer(long customerId) {
+    public List<Schedule> getAllSchedulesForCustomer(long customerId) {
         Customer customer = customersRepository.getOne(customerId);
-        List<Schedule> schedules = schedulesRepository.getAllByPetsIn(customer.getPets());
-        return schedules.stream().map(this::getDTOModel).collect(Collectors.toList());
+        return  schedulesRepository.getAllByPetsIn(customer.getPets());
     }
 
-    public ScheduleDTO saveSchedule(ScheduleDTO scheduleDTO) {
-        Schedule schedule = new Schedule();
-        List<Employee> employees = employeesRepository.findAllById(scheduleDTO.getEmployeeIds());
+    public Schedule saveSchedule(Schedule schedule, List<Long> employeeIds, List<Long> petIds) {
+        List<Employee> employees = employeesRepository.findAllById(employeeIds);
+        List<Pet> pets = petsRepository.findAllById(petIds);
         schedule.setEmployees(employees);
-        List<Pet> pets = petsRepository.findAllById(scheduleDTO.getPetIds());
         schedule.setPets(pets);
-        schedule.setDate(scheduleDTO.getDate());
-        schedule.setActivities(scheduleDTO.getActivities());
-        schedule = schedulesRepository.save(schedule);
-        return getDTOModel(schedule);
-    }
-
-    private ScheduleDTO getDTOModel(Schedule schedule) {
-        ScheduleDTO scheduleDTO = new ScheduleDTO();
-        scheduleDTO.setId(schedule.getId());
-        scheduleDTO.setEmployeeIds(schedule.getEmployees().stream().map(Employee::getId).collect(Collectors.toList()));
-        scheduleDTO.setPetIds(schedule.getPets().stream().map(Pet::getId).collect(Collectors.toList()));
-        scheduleDTO.setDate(schedule.getDate());
-        scheduleDTO.setActivities(schedule.getActivities());
-        return scheduleDTO;
+        return schedulesRepository.save(schedule);
     }
 }
