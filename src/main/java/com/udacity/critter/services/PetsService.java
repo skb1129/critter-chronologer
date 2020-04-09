@@ -2,14 +2,12 @@ package com.udacity.critter.services;
 
 import com.udacity.critter.entities.Customer;
 import com.udacity.critter.entities.Pet;
-import com.udacity.critter.pet.PetDTO;
 import com.udacity.critter.repositories.CustomersRepository;
 import com.udacity.critter.repositories.PetsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PetsService {
@@ -20,43 +18,24 @@ public class PetsService {
     @Autowired
     private CustomersRepository customersRepository;
 
-    public List<PetDTO> getAllPets() {
-        List<Pet> pets = petsRepository.findAll();
-        return pets.stream().map(this::getDTOModel).collect(Collectors.toList());
+    public List<Pet> getAllPets() {
+        return petsRepository.findAll();
     }
 
-    public List<PetDTO> getPetsByCustomerId(long customerId) {
-        List<Pet> pets = petsRepository.getAllByCustomerId(customerId);
-        return pets.stream().map(this::getDTOModel).collect(Collectors.toList());
+    public List<Pet> getPetsByCustomerId(long customerId) {
+        return petsRepository.getAllByCustomerId(customerId);
     }
 
-    public PetDTO getPetById(long petId) {
-        Pet pet = petsRepository.getOne(petId);
-        return getDTOModel(pet);
+    public Pet getPetById(long petId) {
+        return petsRepository.getOne(petId);
     }
 
-    public PetDTO savePet(PetDTO petDTO) {
-        Pet pet = new Pet();
-        Customer customer = customersRepository.getOne(petDTO.getOwnerId());
-        pet.setType(petDTO.getType());
-        pet.setName(petDTO.getName());
+    public Pet savePet(Pet pet, long ownerId) {
+        Customer customer = customersRepository.getOne(ownerId);
         pet.setCustomer(customer);
-        pet.setBirthDate(petDTO.getBirthDate());
-        pet.setNotes(petDTO.getNotes());
         pet = petsRepository.save(pet);
         customer.insertPet(pet);
         customersRepository.save(customer);
-        return getDTOModel(pet);
-    }
-
-    private PetDTO getDTOModel(Pet pet) {
-        PetDTO petDTO = new PetDTO();
-        petDTO.setId(pet.getId());
-        petDTO.setName(pet.getName());
-        petDTO.setType(pet.getType());
-        petDTO.setOwnerId(pet.getCustomer().getId());
-        petDTO.setBirthDate(pet.getBirthDate());
-        petDTO.setNotes(pet.getNotes());
-        return petDTO;
+        return pet;
     }
 }
